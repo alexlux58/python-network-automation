@@ -5,7 +5,8 @@ import time
 ssh_client = paramiko.SSHClient()
 ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-router = {'hostname': '10.1.1.10', 'port': '22', 'username':'u1', 'password':'cisco'}
+router = {'hostname': '10.1.1.10', 'port': '22',
+          'username': 'u1', 'password': 'cisco'}
 print(f'Connecting to {router["hostname"]}')
 ssh_client.connect(**router, look_for_keys=False, allow_agent=False)
 
@@ -17,7 +18,8 @@ shell = ssh_client.invoke_shell()
 shell.send('terminal length 0\n')
 shell.send('show version\n')
 shell.send('show ip int brief\n')
-time.sleep(1)  # waiting for the remove device to finish executing the commands (mandatory)
+# waiting for the remote device to finish executing the commands (mandatory)
+time.sleep(1)
 
 # reading from the shell's output buffer
 output = shell.recv(10000)
