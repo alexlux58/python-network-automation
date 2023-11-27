@@ -1,0 +1,68 @@
+! Basic Setup
+hostname L3Switch1
+no ip domain-lookup
+enable secret [Your_Secure_Password]
+service password-encryption
+
+! Console and VTY Security
+line console 0
+ login local
+ exec-timeout 10 0
+line vty 0 15
+ login local
+ transport input ssh
+ exec-timeout 10 0
+
+! User Authentication
+username [Your_Username] privilege 15 secret [Your_User_Password]
+
+! VLAN Configuration
+vlan 10
+ name Data_VLAN
+vlan 20
+ name Voice_VLAN
+
+! Interface Configuration for VLANs (SVIs)
+interface Vlan10
+ ip address [VLAN10_IP_Address] [Subnet_Mask]
+ no shutdown
+interface Vlan20
+ ip address [VLAN20_IP_Address] [Subnet_Mask]
+ no shutdown
+
+! Routing Configuration
+ip routing
+router ospf 1
+ network [Your_Network_Address] [Wildcard_Mask] area 0
+ passive-interface default
+ no passive-interface Vlan10
+ no passive-interface Vlan20
+
+! Access Ports Configuration
+interface range gi1/0/1 - 24
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+
+! Trunk Ports Configuration
+interface range gi1/0/25 - 48
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20
+
+! Security Features
+ip ssh version 2
+access-list 100 permit ip any any
+
+! DHCP Relay (if required)
+interface Vlan10
+ ip helper-address [DHCP_Server_IP]
+
+! Quality of Service (QoS) - Example Configuration
+auto qos voip cisco-phone
+
+! Logging and NTP
+logging [Syslog_Server_Address]
+ntp server [NTP_Server_Address]
+
+end

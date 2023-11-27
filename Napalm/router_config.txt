@@ -1,0 +1,65 @@
+! Basic Setup
+hostname Router1
+no ip domain-lookup
+enable secret [Your_Secure_Password]
+service password-encryption
+
+! Console and VTY Security
+line console 0
+ login local
+ exec-timeout 10 0
+line vty 0 15
+ login local
+ transport input ssh
+ exec-timeout 10 0
+
+! User Authentication
+username [Your_Username] privilege 15 secret [Your_User_Password]
+
+! SNMP (Simple Network Management Protocol) - For Network Management
+snmp-server community [Your_Community_String] RO
+snmp-server location [Your_Location]
+snmp-server contact [Your_Contact_Info]
+
+! NTP (Network Time Protocol) - For Time Synchronization
+ntp server [NTP_Server_Address]
+
+! Syslog - For Logging
+logging [Syslog_Server_Address]
+
+! Interface Configuration
+interface GigabitEthernet0/0
+ ip address [Your_Interface_IP] [Your_Subnet_Mask]
+ no shutdown
+ description [Your_Description]
+
+! Routing Protocol Configuration (e.g., OSPF)
+router ospf 1
+ network [Your_Network_Address] [Your_Wildcard_Mask] area 0
+
+! NAT Configuration (if applicable)
+ip nat inside source list 1 interface GigabitEthernet0/1 overload
+access-list 1 permit [Your_Internal_Network] [Your_Wildcard_Mask]
+
+! DHCP Configuration (if the router is used as a DHCP server)
+ip dhcp pool LAN
+ network [DHCP_Network_Address] [DHCP_Subnet_Mask]
+ default-router [Default_Gateway_Address]
+ dns-server [DNS_Server_Address]
+
+! Security Features
+ip ssh version 2
+access-list 100 permit ip any any
+control-plane host
+ management-plane protection
+
+! Quality of Service (QoS) - Example Configuration
+class-map match-any VOICE
+ match ip dscp ef
+policy-map QOS_POLICY
+ class VOICE
+  priority percent 30
+interface GigabitEthernet0/0
+ service-policy output QOS_POLICY
+
+end

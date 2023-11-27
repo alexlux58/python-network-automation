@@ -1,0 +1,72 @@
+! Basic Setup
+hostname Switch1
+no ip domain-lookup
+enable secret [Your_Secure_Password]
+service password-encryption
+
+! Console and VTY Security
+line console 0
+ login local
+ exec-timeout 10 0
+line vty 0 15
+ login local
+ transport input ssh
+ exec-timeout 10 0
+
+! User Authentication
+username [Your_Username] privilege 15 secret [Your_User_Password]
+
+! SNMP (Simple Network Management Protocol) - For Network Management
+snmp-server community [Your_Community_String] RO
+snmp-server location [Your_Location]
+snmp-server contact [Your_Contact_Info]
+
+! NTP (Network Time Protocol) - For Time Synchronization
+ntp server [NTP_Server_Address]
+
+! Syslog - For Logging
+logging [Syslog_Server_Address]
+
+! VLAN Configuration
+vlan 10
+ name Data_VLAN
+vlan 20
+ name Voice_VLAN
+
+! Interface Configuration
+interface range gi0/1-24
+ switchport mode access
+ switchport access vlan 10
+ switchport voice vlan 20
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ no shutdown
+
+! Trunk Configuration (for uplinks to other switches)
+interface gi0/25
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 1,10,20
+ no shutdown
+
+! Security Features
+ip ssh version 2
+access-list 100 permit ip any any
+
+! Enable DHCP Snooping (if using DHCP in the network)
+ip dhcp snooping vlan 10
+ip dhcp snooping
+
+! Enable Port Security (example for one interface)
+interface gi0/1
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security violation restrict
+ switchport port-security aging time 2
+ switchport port-security aging type inactivity
+
+! Disable Unused Ports
+interface range gi0/26-48
+ shutdown
+
+end

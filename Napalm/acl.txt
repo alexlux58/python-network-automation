@@ -1,0 +1,33 @@
+!Access Layer ACLs:
+!At the access layer, ACLs typically focus on restricting access to the network and protecting end devices.
+
+! Deny unauthorized access to the network
+access-list 101 deny ip any host 192.168.1.0
+! Permit specific traffic to the network
+access-list 101 permit tcp any host 192.168.1.100 eq 80
+! Permit all other traffic
+access-list 101 permit ip any any
+
+!Distribution Layer ACLs:
+!The distribution layer is where you implement most of your network policies, filtering traffic from the access layer to the core.
+
+! Block specific traffic from entering the core network
+access-list 102 deny tcp any any eq telnet
+access-list 102 deny icmp any any
+! Allow other traffic to the core network
+access-list 102 permit ip any any
+
+!Core Layer ACLs:
+!Core layer ACLs are typically minimal to ensure high throughput. The focus is on protecting the core infrastructure without impacting performance.
+
+! Protect core infrastructure devices
+access-list 103 deny ip any host 10.0.0.1
+access-list 103 permit ip any any
+
+!Data Center/Services Layer ACLs:
+!ACLs at this layer protect critical servers and services, such as web servers, databases, and application servers.
+
+! Restrict access to critical servers
+access-list 104 deny ip any host 10.0.1.10
+access-list 104 permit tcp any host 10.0.1.20 eq 443
+access-list 104 permit ip any any
